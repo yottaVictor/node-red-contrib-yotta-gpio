@@ -1,0 +1,38 @@
+{
+  "name": "node-red-contrib-yotta-gpio",
+  "version": "1.0.1",
+  "description": "Yotta GPIO API nodes for Node-RED",
+  "keywords": [
+    "node-red",
+    "yotta",
+    "gpio",
+    "modbus"
+  ],
+  "author": "Victor <victor@yottacontrol.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/yottaVictor/node-red-contrib-yotta-gpio",
+  "bugs": {
+    "url": "https://github.com/yottaVictor/node-red-contrib-yotta-gpio/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yottaVictor/node-red-contrib-yotta-gpio.git"
+  },
+  "node-red": {
+    "nodes": {
+      "Read_DI": "src/read_module/Read_DI.js",
+      "Read_DO": "src/read_module/Read_DO.js",
+      "Read_AI": "src/read_module/Read_AI.js",
+      "Read_AO": "src/read_module/Read_AO.js",
+      "Write_DO": "src/write_module/Write_DO.js",
+      "Write_AO": "src/write_module/Write_AO.js"
+    }
+  },
+  "files": [
+    "src",
+    "modelData"
+  ],
+  "dependencies": {
+    "node-red-contrib-yotta-gpio": "^1.0.0"
+  }
+}
