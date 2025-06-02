@@ -1,0 +1,425 @@
+[
+    {
+        "id": "1ef35619514aef68",
+        "type": "tab",
+        "label": "流程5",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "0c81438ad8d35f8b",
+        "type": "group",
+        "z": "1ef35619514aef68",
+        "name": "",
+        "style": {
+            "label": true,
+            "fill-opacity": "0.56"
+        },
+        "nodes": [
+            "84f08b729825866e",
+            "c4ea206ffd8e9158",
+            "510387905cae1684",
+            "dc6661f7e8a6dd79",
+            "5257dce0e1b7527f",
+            "7effe6be5c7b79c7",
+            "e83a1c06546982f6",
+            "7a9b54e47525bca3",
+            "b9cba118e3f918de",
+            "881cf653735b1742",
+            "e715335bd62a660a",
+            "1cfe731b16ee24e3",
+            "bdbe41b28bffecd8",
+            "30a8976fd73fb5a1",
+            "3d48319ec7d18092",
+            "132cef92878c40f0"
+        ],
+        "x": 134,
+        "y": 99,
+        "w": 832,
+        "h": 342
+    },
+    {
+        "id": "84f08b729825866e",
+        "type": "inject",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 230,
+        "y": 140,
+        "wires": [
+            [
+                "e83a1c06546982f6"
+            ]
+        ]
+    },
+    {
+        "id": "c4ea206ffd8e9158",
+        "type": "debug",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "debug 55",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "510387905cae1684",
+        "type": "modbus-flex-write",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "showStatusActivities": false,
+        "showErrors": true,
+        "server": "6aa025f7928cfbeb",
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "x": 650,
+        "y": 140,
+        "wires": [
+            [
+                "c4ea206ffd8e9158"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "dc6661f7e8a6dd79",
+        "type": "inject",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 230,
+        "y": 180,
+        "wires": [
+            [
+                "e83a1c06546982f6"
+            ]
+        ]
+    },
+    {
+        "id": "5257dce0e1b7527f",
+        "type": "inject",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[1,1,1,1]",
+        "payloadType": "json",
+        "x": 240,
+        "y": 220,
+        "wires": [
+            [
+                "7a9b54e47525bca3"
+            ]
+        ]
+    },
+    {
+        "id": "7effe6be5c7b79c7",
+        "type": "inject",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[0,0,0,0]",
+        "payloadType": "json",
+        "x": 240,
+        "y": 260,
+        "wires": [
+            [
+                "7a9b54e47525bca3"
+            ]
+        ]
+    },
+    {
+        "id": "e83a1c06546982f6",
+        "type": "Write_DO",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "model": "A-1060",
+        "modelQty": "0",
+        "modbusId": "2",
+        "modbusQty": "1",
+        "modbusAddr": "16",
+        "x": 420,
+        "y": 140,
+        "wires": [
+            [
+                "510387905cae1684",
+                "132cef92878c40f0"
+            ]
+        ]
+    },
+    {
+        "id": "7a9b54e47525bca3",
+        "type": "Write_DO",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "model": "A-1060",
+        "modelQty": "0",
+        "modbusId": "2",
+        "modbusQty": "4",
+        "modbusAddr": "16",
+        "x": 420,
+        "y": 240,
+        "wires": [
+            [
+                "510387905cae1684"
+            ]
+        ]
+    },
+    {
+        "id": "b9cba118e3f918de",
+        "type": "comment",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "寫入",
+        "info": "",
+        "x": 830,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "881cf653735b1742",
+        "type": "modbus-flex-getter",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "logIOActivities": false,
+        "server": "6aa025f7928cfbeb",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "x": 650,
+        "y": 360,
+        "wires": [
+            [
+                "c4ea206ffd8e9158"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "e715335bd62a660a",
+        "type": "inject",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 230,
+        "y": 400,
+        "wires": [
+            [
+                "bdbe41b28bffecd8"
+            ]
+        ]
+    },
+    {
+        "id": "1cfe731b16ee24e3",
+        "type": "inject",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 230,
+        "y": 320,
+        "wires": [
+            [
+                "30a8976fd73fb5a1"
+            ]
+        ]
+    },
+    {
+        "id": "bdbe41b28bffecd8",
+        "type": "Read_DI",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "model": "A-1060",
+        "modelQty": "0",
+        "modbusId": "2",
+        "modbusQty": "1",
+        "modbusAddr": "0",
+        "x": 400,
+        "y": 400,
+        "wires": [
+            [
+                "881cf653735b1742"
+            ]
+        ]
+    },
+    {
+        "id": "30a8976fd73fb5a1",
+        "type": "Read_DO",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "",
+        "model": "A-1060",
+        "modelQty": "0",
+        "modbusId": "2",
+        "modbusQty": "4",
+        "modbusAddr": "16",
+        "x": 400,
+        "y": 320,
+        "wires": [
+            [
+                "881cf653735b1742"
+            ]
+        ]
+    },
+    {
+        "id": "3d48319ec7d18092",
+        "type": "comment",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "讀取",
+        "info": "",
+        "x": 830,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "132cef92878c40f0",
+        "type": "debug",
+        "z": "1ef35619514aef68",
+        "g": "0c81438ad8d35f8b",
+        "name": "debug 56",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "6aa025f7928cfbeb",
+        "type": "modbus-client",
+        "name": "",
+        "clienttype": "simpleser",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "tcpHost": "127.0.0.1",
+        "tcpPort": "502",
+        "tcpType": "DEFAULT",
+        "serialPort": "COM8",
+        "serialType": "RTU-BUFFERD",
+        "serialBaudrate": "9600",
+        "serialDatabits": "8",
+        "serialStopbits": "1",
+        "serialParity": "none",
+        "serialConnectionDelay": "100",
+        "serialAsciiResponseStartDelimiter": "0x3A",
+        "unit_id": 1,
+        "commandDelay": 1,
+        "clientTimeout": 1000,
+        "reconnectOnTimeout": true,
+        "reconnectTimeout": 2000,
+        "parallelUnitIdsAllowed": true
+    }
+]

@@ -1,0 +1,485 @@
+<!-- <style>
+  .input-error {
+    border: 2px solid red !important;
+  }
+</style> -->
+
+<script type="text/html" data-template-name="Write_DO">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-model"><i class="fa fa-cube"></i> 產品型號</label>
+    <select id="node-input-model"></select>
+  </div>
+  
+  <div class="form-row">    
+    <label for="node-input-modelqty"><i class="fa fa-sliders"></i> 輸出</label> 
+    <select id="node-input-modelqty"></select>    
+    
+  </div>  
+
+  <div class="form-row">
+    <label for="node-input-modbusid"><i class="fa fa-id-badge"></i> Modbus ID</label>
+    <input type="text" id="node-input-modbusid">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-modbusqty"><i class="fa fa-sort-numeric-asc"></i> 數量</label>
+    <input type="text" id="node-input-modbusqty">
+  </div>
+  
+  <div class="form-row">
+    <label for="node-input-modbusaddr"><i class="fa fa-map-marker"></i> 起始位址</label>
+    <input type="text" id="node-input-modbusaddr" readonly >
+  </div>
+
+ 
+    <!-- <fieldset style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">           
+        <input type="checkbox" id="chbx" name="agree" value="Yes!" />
+        <label for="chbx">I agree</label>
+    </fieldset> -->
+  
+  
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('Write_DO', {
+        category: 'YOTTA GPIO',
+        color: '#FFD700',
+        paletteLabel: "Write-DO", // 左側欄位顯示的節點名稱
+        defaults: {
+            name: { value: "" },
+            model: { value: "" },            
+            modelQty: { value: "" },
+            modbusId: { value: "1" },            
+            modbusQty:{ value: "1" },
+            modbusAddr: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        align: "right",
+        icon: "serial.svg",
+        label: function () {
+            return this.name || this.model;
+        },
+     
+        oneditprepare: function () {            
+
+            const $model = $("#node-input-model");            
+            const $modelqty = $("#node-input-modelqty");
+            const $modbusid = $("#node-input-modbusid");            
+            const $modbusqty = $("#node-input-modbusqty");
+            const $modbusaddr = $("#node-input-modbusaddr");
+
+            var savedModel = this.model;           
+            var savedQty = this.modelQty;
+            var savedModebusId = this.modbusId;
+            var savedModbusQty = this.modbusQty; 
+            var savedModbusAddr = this.modbusAddr;
+            var moduleData;
+        
+            debugger; // 在瀏覽器中執行Ctr+Shit+i開啟除錯畫面，可以針對html中的程式除錯
+            $.getJSON("Write_DO/0", function (data) { //向後端獲取產品訊息
+                moduleData = data;
+                // 填入型號選單
+                //$.each(moduleData, function (modelName,modelInfo) {
+                //    if(modelInfo.DO > 0){
+                //        $model.append($("<option></option>").val(modelName).text(modelName));
+                //    }
+                //});            
+                $.each(moduleData, function (categoryName, models) {
+                    const $optgroup = $("<optgroup></optgroup>")
+                        .attr("label", categoryName);
+
+                    $.each(models, function (modelName, modelInfo) {
+                        if (modelInfo.DO > 0) {
+                            $optgroup.append(
+                                $("<option></option>").val(modelName).text(modelName)
+                            );
+                        }
+                    });
+
+                    // 如果 optgroup 下有 option 再加入
+                    if ($optgroup.children().length > 0) {
+                        $model.append($optgroup);
+                    }
+                });
+
+                if (!savedModel) {
+                    savedModel = $model.find("option:first").val();
+                } else $model.val(savedModel); //若savedModel非空，載入model欄位初值
+
+                if (savedQty) $modelqty.val(savedQty); //若savedQty非空，載入Qty欄位初值
+                if (savedModebusId) $modbusid.val(savedModebusId);    //若savedId非空，載入modbusid欄位初值                 
+                if (savedModbusQty) $modbusqty.val(savedModbusQty);    //若savedModbusQty非空，載入modbusqty欄位初值
+
+                $model.on("change", function () {
+                    savedModel = $(this).val();   
+                              
+                    savedQty = 0;          
+                    
+                    updateQtyAndAddress(savedModel);
+                });
+
+                               
+                $modelqty.on("change", function () {
+                    savedQty = $(this).val();   
+                    //const addr = moduleData[savedModel].address["DO"]+Number(savedQty);
+                    const modelInfo = findModelInfo(model);
+                    const addr = modelInfo.address["DO"] + Number(savedQty);
+                    $modbusaddr.val(addr !== null ? addr : "N/A");
+
+                    const val = $(this).val().trim();
+                    if (val === "" || val === "0") {
+                        $(this).addClass("input-error");
+                    } else {
+                        $(this).removeClass("input-error");
+                    }
+                    
+                });
+
+                $modbusid.on("keyup", function () { //輸入中(keyup)或輸入完畢後離開欄位(change)，都能觸發驗證或處理邏輯。
+                    const val = Number($(this).val().trim());
+                    if (val == 0 || isNaN(val) ) { //判斷modbus ID欄位內容是否合法，不合法將欄位邊框變紅色
+                        $(this).addClass("input-error");
+                    } else {
+                        $(this).removeClass("input-error");
+                    }
+                });
+
+                $modbusqty.on("keyup", function () { //輸入中(keyup)或輸入完畢後離開欄位(change)，都能觸發驗證或處理邏輯。
+                    const val = Number($(this).val().trim());
+                    if (val == 0 || isNaN(val)) {  //判斷modbus 數量欄位內容是否合法，不合法將欄位邊框變紅色
+                        $(this).addClass("input-error");
+                    } else {
+                        $(this).removeClass("input-error");
+                    }
+                });
+
+                // 觸發初始化選項
+                if (savedModel) {
+                    updateQtyAndAddress(savedModel);
+                    //if(savedModebusId == "") $modbusid.val("1");
+                    //if(savedModbusQty == "") $modbusqty.val("1");
+                    $modbusid.trigger("keyup");
+                    $modbusqty.trigger("keyup");                             
+                }
+            
+            })
+            .fail(function() { 
+                console.log( "error" );
+            });
+
+            function findModelInfo(modelName) {
+                for (const category in moduleData) {
+                    if (moduleData[category][modelName]) {
+                        return moduleData[category][modelName];
+                    }
+                }
+                return null;
+            }
+            
+            function updateQtyAndAddress(model) { //將指定model的輸出/入類別編號填入option選單內。
+                $modelqty.empty();                      //清空<select id="node-input-modelqty"> 這個欄位中的所有 <option>，以便重新建立。
+                //const count = moduleData[model]["DO"]-1;
+                //const addr = moduleData[model].address["DO"] + Number(savedQty);
+                const modelInfo = findModelInfo(model);
+                if (!modelInfo) return;
+                const count = modelInfo["DO"] - 1;
+                const addr = modelInfo.address["DO"] + Number(savedQty);
+                for (let i = 0; i <= count; i++) {
+                    $modelqty.append($("<option></option>").val(i).text("DO " + i));
+                }
+                if (savedQty) $modelqty.val(savedQty);
+                $modbusaddr.val(addr !== null ? addr : "N/A");
+            }
+        },
+        oneditsave: function () {
+            this.name = $("#node-input-name").val();
+            this.model = $("#node-input-model").val();           
+            this.modelQty = $("#node-input-modelqty").val();
+            this.modbusId = $("#node-input-modbusid").val();            
+            this.modbusAddr = $("#node-input-modbusaddr").val();
+            this.modbusQty = $("#node-input-modbusqty").val();       
+        },
+        oneditresize: function (size) {
+
+        }
+    });
+</script>
+
+
+<script type="text/x-red" data-help-name="Write_DO">
+    <p>
+        <strong>Write_DO</strong> 節點用於將指定數值寫入 DO (Digital Output) 腳位，並與 <code>Modbus-Flex-Write</code> 節點配合使用。
+    </p>
+
+    <h3>功能說明</h3>
+    
+    <ul>
+        <li><strong>產品型號</strong>：支援多種 Yotta 模組型號</li>
+        <li><strong>輸出腳位</strong>：可選擇 DO 腳位 (例如 DO 0、DO 1 等)</li>
+        <li><strong>Modbus ID</strong>：目標設備的通訊位址</li>
+        <li><strong>數量</strong>：寫入的腳位數量</li>
+    </ul>   
+
+    <h3>注意事項</h3>
+    <ul>
+        <li>Modbus ID、腳位數量與起始位址必須正確對應實際設備</li>
+        <li>務必與 <code>Modbus-Flex-Write</code> 節點搭配使用</li>
+        <li>未填寫必要欄位將導致資料封包錯誤</li>
+        <li>當寫入數量大於 1 時，注入的<code>msg.payload</code> 必須為 <code>array[]</code> 格式，例如：<code>[1, 1]</code></li>
+    </ul>
+
+    <h3>使用範例</h3>
+    <p>將 DO 0~3 設為 High/Low：</p>    
+    <pre><code style="font-size: smaller">
+    [
+    {
+        "id": "10f36070430118c5",
+        "type": "tab",
+        "label": "流程4",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f846e7029f3192d8",
+        "type": "inject",
+        "z": "10f36070430118c5",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "x": 170,
+        "y": 100,
+        "wires": [
+            [
+                "1302bcc2eefc651e"
+            ]
+        ]
+    },
+    {
+        "id": "088232fa064cdf4f",
+        "type": "debug",
+        "z": "10f36070430118c5",
+        "name": "debug 49",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "0958a9be2de05815",
+        "type": "modbus-flex-write",
+        "z": "10f36070430118c5",
+        "name": "",
+        "showStatusActivities": false,
+        "showErrors": true,
+        "server": "6aa025f7928cfbeb",
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "x": 590,
+        "y": 100,
+        "wires": [
+            [
+                "088232fa064cdf4f"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d35d353dcf03406b",
+        "type": "inject",
+        "z": "10f36070430118c5",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 170,
+        "y": 140,
+        "wires": [
+            [
+                "1302bcc2eefc651e"
+            ]
+        ]
+    },
+    {
+        "id": "56ebf44ab51af0f3",
+        "type": "inject",
+        "z": "10f36070430118c5",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[1,1,1,1]",
+        "payloadType": "json",
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "52ed0f4906d8509c"
+            ]
+        ]
+    },
+    {
+        "id": "6e1c481a11adcb51",
+        "type": "inject",
+        "z": "10f36070430118c5",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[0,0,0,0]",
+        "payloadType": "json",
+        "x": 180,
+        "y": 220,
+        "wires": [
+            [
+                "52ed0f4906d8509c"
+            ]
+        ]
+    },
+    {
+        "id": "1302bcc2eefc651e",
+        "type": "Write_DO",
+        "z": "10f36070430118c5",
+        "name": "",
+        "model": "A-1060",
+        "modelQty": "0",
+        "modbusId": "1",
+        "modbusQty": "1",
+        "modbusAddr": "16",
+        "x": 360,
+        "y": 100,
+        "wires": [
+            [
+                "0958a9be2de05815"
+            ]
+        ]
+    },
+    {
+        "id": "52ed0f4906d8509c",
+        "type": "Write_DO",
+        "z": "10f36070430118c5",
+        "name": "",
+        "model": "A-1060",
+        "modelQty": "0",
+        "modbusId": "2",
+        "modbusQty": "4",
+        "modbusAddr": "16",
+        "x": 360,
+        "y": 200,
+        "wires": [
+            [
+                "0958a9be2de05815"
+            ]
+        ]
+    },
+    {
+        "id": "97d366b6b98b108e",
+        "type": "comment",
+        "z": "10f36070430118c5",
+        "name": "單點寫入",
+        "info": "",
+        "x": 360,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "9343c6786ff87837",
+        "type": "comment",
+        "z": "10f36070430118c5",
+        "name": "多點寫入",
+        "info": "",
+        "x": 360,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "6aa025f7928cfbeb",
+        "type": "modbus-client",
+        "name": "",
+        "clienttype": "simpleser",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "tcpHost": "127.0.0.1",
+        "tcpPort": "502",
+        "tcpType": "DEFAULT",
+        "serialPort": "COM8",
+        "serialType": "RTU-BUFFERD",
+        "serialBaudrate": "9600",
+        "serialDatabits": "8",
+        "serialStopbits": "1",
+        "serialParity": "none",
+        "serialConnectionDelay": "100",
+        "serialAsciiResponseStartDelimiter": "0x3A",
+        "unit_id": "1",
+        "commandDelay": "1",
+        "clientTimeout": "1000",
+        "reconnectOnTimeout": true,
+        "reconnectTimeout": "2000",
+        "parallelUnitIdsAllowed": true
+    }
+    ]
+    </pre></code>
+</script>
