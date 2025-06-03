@@ -1,6 +1,6 @@
 const moduleData = {    
     "Controller": {
-        "A-5188x": {
+        "A-5188x/A-5288x": {
             DI: 8, DO: 4, AI: 0, AO: 0,
             address: {
                 DI: 0,
@@ -9,7 +9,7 @@ const moduleData = {
                 AO: null
             }
         }, 
-        "A-5189x": {
+        "A-5189x/A-5289x": {
             DI: 4, DO: 4, AI: 4, AO: 0,
             address: {
                 DI: 100,
@@ -27,7 +27,7 @@ const moduleData = {
                 AO: null
             }
         }, 
-        "A-5190x": {
+        "A-5190x/A529x": {
             DI: 2, DO: 2, AI: 4, AO: 2,
             address: {
                 DI: 0,
