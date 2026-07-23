@@ -15,7 +15,7 @@ module.exports = function (RED) {
     var fc;
     var text ="";
     
-    if(node.modbusQty>1) text = `...AO ${node.modelQty + node.modbusQty}`;
+    if(node.modbusQty>1) text = `...AO ${node.modelQty + node.modbusQty-1}`;
     node.status({fill:"grey",shape:"dot",text:"AO "+ node.modelQty + text}); //在外觀顯示該節點是read or write
 
     this.on("input", function (msg) {

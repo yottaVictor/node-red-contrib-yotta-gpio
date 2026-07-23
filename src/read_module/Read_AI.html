@@ -126,7 +126,7 @@
                 $modelqty.on("change", function () {
                     savedQty = $(this).val();   
                     //const addr = moduleData[savedModel].address["AI"] + Number(savedQty);
-                    const modelInfo = findModelInfo(model);
+                    const modelInfo = findModelInfo(savedModel);
                     const addr = modelInfo.address["AI"] + Number(savedQty);
                     $modbusaddr.val(addr !== null ? addr : "N/A");
                     

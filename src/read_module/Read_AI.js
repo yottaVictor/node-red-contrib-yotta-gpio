@@ -15,7 +15,7 @@ module.exports = function (RED) {
     
      var text ="";
     
-    if(node.modbusQty>1) text = `...AI ${node.modelQty + node.modbusQty}`;
+    if(node.modbusQty>1) text = `...AI ${node.modelQty + node.modbusQty-1}`;
     node.status({fill:"grey",shape:"dot",text:"AI "+ node.modelQty + text}); //在外觀顯示該節點是read or write
     
     this.on("input", function (msg) {
@@ -46,7 +46,7 @@ module.exports = function (RED) {
   }
   RED.nodes.registerType("Read_AI", YottaReadAiNode);
 
-  RED.httpAdmin.get("/Read_AI/:command", RED.auth.needsPermission('commandfield.read'), function(req,res) {        
+  RED.httpAdmin.get("/Read_AI/:command", RED.auth.needsPermission('commandfield.read'),  function(req,res) {        
       res.json(moduleData);
   });
 };

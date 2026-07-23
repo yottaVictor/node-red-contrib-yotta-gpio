@@ -30,6 +30,7 @@
     <input type="text" id="node-input-modbusaddr" readonly >
   </div>
   
+  
 </script>
 
 
@@ -119,7 +120,7 @@
                 
                 $modelqty.on("change", function () {
                     savedQty = $(this).val(); 
-                    const modelInfo = findModelInfo(model);  
+                    const modelInfo = findModelInfo(savedModel);  
                     //const addr = moduleData[savedModel].address["DI"]+Number(savedQty);
                     const addr = modelInfo.address["DI"] + Number(savedQty);
                     $modbusaddr.val(addr !== null ? addr : "N/A");
